@@ -1,3 +1,4 @@
 slack-bolt
-slackblocks >= 0.3.1
 cachetools >= 5.3.0
+blockkit >= 1.5.2
+black
