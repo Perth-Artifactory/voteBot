@@ -2,6 +2,9 @@
 # https://stackoverflow.com/questions/33533148/how-do-i-type-hint-a-method-with-the-type-of-the-enclosing-class
 from __future__ import annotations
 
+import jsonpickle
+import jsonpickle.util
+
 from dataclasses import dataclass, replace
 from datetime import datetime
 from enum import StrEnum, auto
@@ -50,6 +53,19 @@ class Event:
 class SlackUser:
     slack_id: str
 
+    def lookup(self):
+        """
+        Looks up a Slack user's details (e.g. display name).
+        Uses cached results where available.
+        :return:
+        """
+    def __format__(self, format_spec) -> str:
+        """
+        :param format_spec:
+        :return: Slack user's name and ID in a human-readable format, e.g. "Jane Doe (DEADBEEF01)".
+        """
+        pass
+
 
 @dataclass
 class Poll:
@@ -96,7 +112,7 @@ class Poll:
                       details=f"Cast vote of {choice}"
                       )
 
-    def edit(self, person: SlackUser, **changes) -> Poll:
+    def edit(self, person: SlackUser, **changes) -> None:
         """
         Records an edit made to any of the parameters of a Poll.
         The edit is recorded as an Event.
