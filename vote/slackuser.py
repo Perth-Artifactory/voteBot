@@ -20,3 +20,6 @@ class SlackUser:
         :return: Slack user's name and ID in a human-readable format, e.g. "Jane Doe (DEADBEEF01)".
         """
         pass
+
+    def __str__(self) -> str:
+        return self.slack_id

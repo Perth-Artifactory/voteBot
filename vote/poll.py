@@ -2,31 +2,59 @@
 # https://stackoverflow.com/questions/33533148/how-do-i-type-hint-a-method-with-the-type-of-the-enclosing-class
 from __future__ import annotations
 
-from dataclasses import dataclass
+import json
+
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from vote.enums import VoteChoice, PollType, PollStatus, EventType
 from vote.event import Event
 from vote.slackuser import SlackUser
 
 
-@dataclass
 class Poll:
-    """
-    Note: @dataclass automatically generates __init__(), __repr__() and __eq__().
-    """
-    poll_type: PollType
-    created_by: SlackUser
-    status: PollStatus
-    public_text: str
-    private_text: str
-    number_of_people_who_must_vote: int
-    people_eligible_to_vote: List[SlackUser]
-    people_who_must_vote: List[SlackUser]
-    votes: Dict[SlackUser, VoteChoice]
-    events: List[Event]
     version: int = 1
+
+    def __init__(self,
+                 poll_type: PollType,
+                 created_by: SlackUser,
+                 status: PollStatus = PollStatus.OPEN,
+                 public_text: str = "",
+                 private_text: str = "",
+                 number_of_people_who_must_vote: int = 0,
+                 people_who_can_vote: Optional[List[SlackUser]] = None,
+                 people_who_must_vote: Optional[List[SlackUser]] = None,
+                 ) -> None:
+
+        self.poll_type = poll_type
+        self.created_by = created_by
+        self.status = status
+        self.public_text = public_text
+        self.private_text = private_text
+        self.number_of_people_who_must_vote = number_of_people_who_must_vote
+
+        self.people_eligible_to_vote: List[SlackUser] = [] if people_who_can_vote is None else people_who_can_vote
+        self.people_who_must_vote: List[SlackUser] = [] if people_who_must_vote is None else people_who_must_vote
+
+        self.votes: Dict[SlackUser, VoteChoice] = dict()
+        self.events: List[Event] = list()
+
+    def to_json_dict(self) -> str:
+        out = dict()
+
+        # out["poll_type"] = str(self.poll_type)
+
+        for attr in ["poll_type", "status", "created_by"]:
+            out[attr] = str(self.__dict__[attr])
+
+        for attr in ["public_text", "private_text", "number_of_people_who_must_vote"]:
+            out[attr] = self.__dict__[attr]
+
+        out["votes"] = {str(slack_user): str(vote_choice) for slack_user, vote_choice in self.votes.items()}
+
+        out["events"] = [event.to_json_dict() for event in self.events]
+
+        return out
 
     def cast_vote(self, voter: SlackUser, choice: VoteChoice) -> None:
         """
