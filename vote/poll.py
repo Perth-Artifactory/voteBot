@@ -2,69 +2,13 @@
 # https://stackoverflow.com/questions/33533148/how-do-i-type-hint-a-method-with-the-type-of-the-enclosing-class
 from __future__ import annotations
 
-import jsonpickle
-import jsonpickle.util
-
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime
-from enum import StrEnum, auto
 from typing import List, Dict
 
-
-class VoteChoice(StrEnum):
-    AYE = auto()
-    NAY = auto()
-    ABSTAIN = auto()
-
-
-class PollType(StrEnum):
-    COMMITTEE_MOTION = auto()
-    COMMITTEE_APPROVAL = auto()
-
-
-class PollStatus(StrEnum):
-    OPEN = auto()
-    PASSED = auto()
-    REJECTED = auto()
-    CLOSED_EARLY = auto()
-    LAPSED = auto()
-
-
-class EventType(StrEnum):
-    CREATED = auto()
-    EDITED = auto()
-    VOTED = auto()
-    CHANGED_VOTE = auto()
-    MANUALLY_CLOSED = auto()
-    MANUALLY_REOPENED = auto()
-    AUTO_CLOSED = auto()
-    SENT_REMINDER_TO_VOTE = auto()
-
-
-@dataclass
-class Event:
-    person: SlackUser | None
-    event_type: EventType
-    timestamp: str  # i.e. datetime.utc_now().isoformat()
-    details: str
-
-
-@dataclass
-class SlackUser:
-    slack_id: str
-
-    def lookup(self):
-        """
-        Looks up a Slack user's details (e.g. display name).
-        Uses cached results where available.
-        :return:
-        """
-    def __format__(self, format_spec) -> str:
-        """
-        :param format_spec:
-        :return: Slack user's name and ID in a human-readable format, e.g. "Jane Doe (DEADBEEF01)".
-        """
-        pass
+from vote.enums import VoteChoice, PollType, PollStatus, EventType
+from vote.event import Event
+from vote.slackuser import SlackUser
 
 
 @dataclass
